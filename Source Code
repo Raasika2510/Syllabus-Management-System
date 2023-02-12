@@ -1,0 +1,984 @@
+from logging import root
+from tkinter import *
+from tkinter import ttk
+import random
+import time
+import datetime
+from tkinter import messagebox
+import mysql.connector
+
+def main():
+    win=Tk()
+    app=Login_window(win)
+    win.mainloop()
+
+
+class Login_window:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("LOGIN")
+        self.root.geometry("646x469+0+0")
+        #img=PhotoImage(file=r'C:\Users\Raasika\Documents\Desktop\logg.png')
+        #Label(root,image=img,justify=CENTER).pack()
+
+#=================================================================buttons and labels=======================================================================
+        framex=Frame(self.root,background="grey",relief=RIDGE)
+        framex.place(x=130,y=30,width=350,height=380)
+
+        lbl=Label(framex,text="LOG IN",font=("Cambria",20,"bold"),fg="black",bg="grey")
+        lbl.place(x=120,y=10)
+
+        username=Label(framex,text="USERNAME:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        username.place(x=20,y=60)
+
+        self.txtuser=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.txtuser.place(x=130,y=60,width=200)
+
+        password=Label(framex,text="PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        password.place(x=20,y=110)
+
+        self.txtpass=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.txtpass.place(x=130,y=110,width=200)
+
+        loginbtn=Button(framex,text="LOGIN",command=self.login,font=("times new roman",12,"bold"),bd=3,relief=RIDGE,fg="white",bg="red",activeforeground="white",activebackground="red")
+        loginbtn.place(x=120,y=170,width=100,height=30)
+
+        
+        signinlbl=Label(framex,text="New User?",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        signinlbl.place(x=20,y=250)
+
+        signinbtn=Button(framex,text="Sign in",command=self.register_window,font=("times new roman",12,"bold"),bd=3,fg="black",bg="grey")
+        signinbtn.place(x=110,y=245,width=100,height=30)
+
+        fpinlbl=Label(framex,text="Forgot Password?",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        fpinlbl.place(x=20,y=300)
+
+        fpinbtn=Button(framex,text="Recollect",command=self.forgot_pass_window,font=("times new roman",12,"bold"),bd=3,fg="black",bg="grey")
+        fpinbtn.place(x=150,y=295,width=100,height=30)
+
+    def register_window(self):
+        self.new_win=Toplevel(self.root)
+        self.app=Sign_in_window(self.new_win)
+
+    def forgot_pass_window(self):
+        self.new_wind=Toplevel(self.root)
+        self.app=fp_window(self.new_wind)
+    
+    def login(self):
+        if self.txtuser.get()==""or self.txtpass.get()=="":
+            messagebox.showerror("ERROR!","All fields are mandatory")
+        else:
+            import mysql.connector
+            con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+            mc=con.cursor()
+            un=self.txtuser.get()
+            x=(un,)
+            ps=self.txtpass.get()
+            mc.execute("select * from logindetails where username=%s",x)
+            row=mc.fetchone()
+            if row==None:
+                messagebox.showerror("ERROR!","Invalid Username and password")
+            else:
+                open_main=messagebox.askyesno("Yes/NO","Application access restricted only to admin")
+                if open_main>0:
+                    self.new_window=Toplevel(self.root)
+                    self.app=sylabus(self.new_window)
+                else:
+                    if not open_main:
+                        return
+            con.commit()
+
+class Sign_in_window:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("SIGN UP")
+        self.root.geometry("775x400+0+0")
+
+        framex=Frame(self.root,background="grey",relief=RIDGE)
+        framex.place(x=10,y=10,width=755,height=380)
+
+        lbl=Label(framex,text="SIGN UP",font=("Cambria",20,"bold"),fg="black",bg="grey")
+        lbl.place(x=330,y=20)
+
+        username=Label(framex,text="USER NAME:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        username.place(x=50,y=100)
+
+        self.ttuser=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttuser.place(x=200,y=100)
+
+        wingname=Label(framex,text="WING:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        wingname.place(x=50,y=140)
+
+        self.ttwing=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttwing.place(x=200,y=140)
+
+        designation=Label(framex,text="DESIGNATION:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        designation.place(x=50,y=180)
+
+        self.ttdesg=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttdesg.place(x=200,y=180)
+
+        yearofjoining=Label(framex,text="YEAR OF JOINING:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        yearofjoining.place(x=50,y=220)
+
+        self.ttyoj=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttyoj.place(x=200,y=220)
+
+        password=Label(framex,text="PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        password.place(x=400,y=100)
+
+        self.ttpass=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttpass.place(x=550,y=100)
+
+        repassword=Label(framex,text="PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        repassword.place(x=400,y=140)
+
+        self.rettpass=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.rettpass.place(x=550,y=140)
+
+        phonenumber=Label(framex,text="PHONE NUMBER:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        phonenumber.place(x=400,y=180)
+
+        self.ttno=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttno.place(x=550,y=180)
+
+        emailid=Label(framex,text="EMAIL ID:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        emailid.place(x=400,y=220)
+
+        self.ttid=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.ttid.place(x=550,y=220)
+
+        loginbtn=Button(framex,command=self.sign_in,text="REGISTER",font=("times new roman",12,"bold"),bd=3,relief=RIDGE,fg="white",bg="red",activeforeground="white",activebackground="red")
+        loginbtn.place(x=300,y=280,width=180)
+
+
+    def sign_in(self):
+        import random
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        wing=self.ttwing.get()
+        repassw=self.rettpass.get()
+        passw=self.ttpass.get()
+        usern=self.ttuser.get()
+        year=self.ttyoj.get()
+        design=self.ttdesg.get()
+        phno=self.ttno.get()
+        emid=self.ttid.get()
+        if passw==""or usern=="":
+            messagebox.showerror("ALL FIELDS ARE MANDATORY","Enter password and username")
+            return
+        elif repassw!=passw:
+            messagebox.showerror("NON-MATCHING","Password is incorrect. re-enter the correct password")
+            return
+        else:
+            query="insert into logindetails(username, wingname, designation, yearofjoining, password, phonenumber, email) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+            val=(usern,wing,design,year,passw,phno,emid,)
+            mc.execute(query,val)                                                                     
+            print(mc.rowcount,"record inserted")
+            con.commit()
+            messagebox.showinfo("SUCCESS!","Your login is registered")
+
+class fp_window:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("RETRIVE PASSWORD")
+        self.root.geometry("646x300+0+0")
+        self.phonenumber=StringVar()
+        #img=PhotoImage(file=r'C:\Users\Raasika\Documents\Desktop\logg.png')
+        #Label(root,image=img,justify=CENTER).pack()
+
+#=================================================================buttons and labels=======================================================================
+        framex=Frame(self.root,background="grey",relief=RIDGE)
+        framex.place(x=130,y=30,width=350,height=240)
+
+        lbl=Label(framex,text="RETRIVE PASSWORD",font=("Cambria",20,"bold"),fg="black",bg="grey")
+        lbl.place(x=40,y=10)
+
+        username=Label(framex,text="PHONE NO.:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        username.place(x=20,y=60)
+
+        self.txtuser=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.txtuser.place(x=130,y=60,width=200)
+
+        password=Label(framex,text="PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        password.place(x=20,y=170)
+
+        self.txtpass=ttk.Entry(framex,textvariable=self.phonenumber,font=("times new roman",12,"bold"),foreground="black",background="grey")
+        self.txtpass.place(x=130,y=170,width=200)
+
+        loginbtn=Button(framex,text="GET PASSWORD",command=self.fg,font=("times new roman",12,"bold"),bd=3,relief=RIDGE,fg="white",bg="red",activeforeground="white",activebackground="red")
+        loginbtn.place(x=90,y=110,width=200,height=30)
+
+    def fg(self):
+        if self.txtuser.get()=="":
+            messagebox.showerror("ERROR!","This field is mandatory")
+        else:
+            import mysql.connector
+            from tkinter import messagebox
+            con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+            mc=con.cursor()
+            un=self.txtuser.get()
+            x=(un,)
+            mc.execute("select * from logindetails where phonenumber=%s",x)
+            row=mc.fetchone()
+            if row==None:
+                messagebox.showerror("ERROR!","Invalid Username and password")
+            else:
+                self.pasw()
+                messagebox.showinfo("RETRIEVED","Use your password to login system")
+                
+    def pasw(self,event=""):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        number1=self.txtuser.get()
+        query="select * from logindetails where phonenumber=%s"
+        val=(number1,)
+        mc.execute(query,val)
+        rows=mc.fetchone()
+        print(rows)
+        self.phonenumber.set(rows[4])
+        con.commit()
+            
+class sylabus:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("GURU NANAK COLLEGE")
+        self.root.geometry("1510x800+0+0")
+
+        self.yearofcourse=StringVar()
+        self.wingofcourse=StringVar()
+        self.cirofcourse=StringVar()
+        self.typeofcourse=StringVar()
+        self.semofcourse=StringVar()
+        self.nameofcourse=StringVar()
+        self.codeofcourse=StringVar()
+        self.theoryofcourse=StringVar()
+
+        self.username=StringVar()
+        self.wing=StringVar()
+        self.designation=StringVar()
+        self.yearofjoining=StringVar()
+        self.password=StringVar()
+        self.phonenumber=StringVar()
+        self.emailid=StringVar()
+
+
+        #====================================================TitleWidget======================================================================
+
+        lbltitle=Label(self.root,bd=20,relief=RIDGE,text="SYLLABUS MANAGEMENT SYSTEM",fg="red",bg="white",font=("Orator Std",30,"bold"))
+        lbltitle.pack(side=TOP,fill=X)
+
+        #====================================================Dataframes=======================================================================
+        
+        lbl=Label(self.root,text="USER OPTIONS :",font=("arial",12,"bold"))
+        lbl.place(x=0,y=95)
+
+        Buttonframe=Frame(self.root,bd=20,relief=RIDGE)
+        Buttonframe.place(x=0,y=120,width=675,height=60)
+
+        Userframe=Frame(self.root,bd=20,relief=RIDGE)
+        Userframe.place(x=0,y=180,width=675,height=200)
+
+        lbl=Label(self.root,text="CURRICULUM OPTIONS :",font=("arial",12,"bold"))
+        lbl.place(x=675,y=95)
+
+        Optionsframe=Frame(self.root,bd=20,relief=RIDGE)
+        Optionsframe.place(x=675,y=120,width=685,height=260)
+
+        lbl=Label(self.root,text="SYLLABUS DETAILS :",font=("arial",14,"bold"))
+        lbl.place(x=0,y=390)
+
+        self.btn41=Button(self.root,text="DELETE SYLLABUS",command=self.deletedata,bg="grey",fg="white",font=("arial",12,"bold"),width=31,height=1)
+        self.btn41.place(x=675,y=390)
+
+        self.btn51=Button(self.root,text="UPDATE SYLLABUS",command=self.update,bg="grey",fg="white",font=("arial",12,"bold"),width=31,height=1)
+        self.btn51.place(x=1000,y=390)
+
+
+        Dataframe=Frame(self.root,bd=20,relief=RIDGE)
+        Dataframe.place(x=0,y=420,width=1360,height=280)
+
+        #=================================================BUTTONFRAME===========================================================
+        self.btn4=Button(Buttonframe,text="LOG OUT",command=self.IExit,bg="grey",fg="white",font=("arial",12,"bold"),width=20,height=1,padx=2,pady=6)
+        self.btn4.grid(row=0,column=1)
+
+        self.btn5=Button(Buttonframe,text="UPDATE USER INFO",command=self.userupdate,bg="grey",fg="white",font=("arial",12,"bold"),width=20,height=1,padx=2,pady=6)
+        self.btn5.grid(row=0,column=2)
+
+        self.btn6=Button(Buttonframe,text="CHANGE PASSWORD",command=self.passwordchange,bg="grey",fg="white",font=("arial",12,"bold"),width=20,height=1,padx=2,pady=6)
+        self.btn6.grid(row=0,column=3)
+        
+        #==================================================DATAFRAME===============================================================
+
+        scroll_x=ttk.Scrollbar(Dataframe,orient=HORIZONTAL)
+        scroll_y=ttk.Scrollbar(Dataframe,orient=VERTICAL)
+
+        self.data_table=ttk.Treeview(Dataframe,column=("subyear","subwing","subcir","subtype","subsem","subname","subcode"),xscrollcommand=scroll_x.set,yscrollcommand=scroll_y.set)
+        scroll_x.pack(side=BOTTOM,fill=X)
+        scroll_y.pack(side=BOTTOM,fill=Y)
+
+        scroll_x=ttk.Scrollbar(command=self.data_table.xview)
+        scroll_y=ttk.Scrollbar(command=self.data_table.yview)
+
+        self.data_table.heading("subyear",text="START YEAR")
+        self.data_table.heading("subwing",text="PROGRAMME")
+        self.data_table.heading("subcir",text="CURRICULUM")
+        self.data_table.heading("subtype",text="TYPE")
+        self.data_table.heading("subsem",text="SEMESTER")
+        self.data_table.heading("subname",text="NAME")
+        self.data_table.heading("subcode",text="CODE")
+        
+        self.data_table["show"]="headings"
+        self.data_table.pack(fill=BOTH,expand=1)
+        self.data_table.bind("<ButtonRelease-1>",self.get_cursor)
+        self.fetch_data()
+
+        #=================================================Userframe==============================================================
+        password=Label(Userframe,text="PASSWORD:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        password.grid(row=0,column=0)
+
+        self.ttpass=ttk.Entry(Userframe,font=("times new roman",12,"bold"))
+        self.ttpass.grid(row=0,column=1)
+
+        self.btnselect=Button(Userframe,command=self.userdetails,text="ENTER",bg="grey",fg="white",font=("arial",12,"bold"),width=12,height=1,padx=2,pady=6)
+        self.btnselect.grid(row=1,column=1)
+
+        username=Label(Userframe,text="USER NAME:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        username.grid(row=2,column=0)
+
+        self.ttuser=ttk.Entry(Userframe,textvariable=self.username,font=("times new roman",12,"bold"))
+        self.ttuser.grid(row=2,column=1)
+
+        wingname=Label(Userframe,text="WING:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        wingname.grid(row=3,column=0)
+
+        self.ttwing=ttk.Entry(Userframe,textvariable=self.wing,font=("times new roman",12,"bold"))
+        self.ttwing.grid(row=3,column=1)
+
+        designation=Label(Userframe,text="DESIGNATION:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        designation.grid(row=0,column=3)
+
+        self.ttdesg=ttk.Entry(Userframe,textvariable=self.designation,font=("times new roman",12,"bold"))
+        self.ttdesg.grid(row=0,column=4)
+
+        yearofjoining=Label(Userframe,text="YEAR OF JOINING:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        yearofjoining.grid(row=1,column=3)
+
+        self.ttyoj=ttk.Entry(Userframe,textvariable=self.yearofjoining,font=("times new roman",12,"bold"))
+        self.ttyoj.grid(row=1,column=4)
+
+        phonenumber=Label(Userframe,text="PHONE NUMBER:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        phonenumber.grid(row=2,column=3)
+
+        self.ttno=ttk.Entry(Userframe,textvariable=self.phonenumber,font=("times new roman",12,"bold"))
+        self.ttno.grid(row=2,column=4)
+
+        emailid=Label(Userframe,text="MAIL ID:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        emailid.grid(row=3,column=3)
+
+        self.ttid=ttk.Entry(Userframe,textvariable=self.emailid,font=("times new roman",12,"bold"))
+        self.ttid.grid(row=3,column=4)
+    #======================================================curriculumframe===========================================================
+        self.searchselect=Button(Optionsframe,command=self.search,text="SEARCH",bg="pink",fg="white",font=("arial",12,"bold"),width=31,height=4,padx=2,pady=6)
+        self.searchselect.grid(row=0,column=0)
+
+        self.addselect=Button(Optionsframe,command=self.addition,text="ADD",bg="pink",fg="white",font=("arial",12,"bold"),width=31,height=4,padx=2,pady=6)
+        self.addselect.grid(row=0,column=1)
+
+        lbl1=Label(Optionsframe,text="Year:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl1.place(x=10,y=100)
+
+        txt1=Entry(Optionsframe,font=("times new roman",10,"bold"),textvariable=self.yearofcourse,width=25)
+        txt1.place(x=80,y=100)
+
+        lbl2=Label(Optionsframe,text="Programme/wing:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl2.place(x=10,y=120)
+
+        comNameCourse=ttk.Combobox(Optionsframe,textvariable=self.wingofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=25)
+        comNameCourse["values"]=("B.Sc IT","B.Com ISM","B.Com CS","B.Com PA","B.Com General","B.Com Honours","B.com Marketing management","BCA","BBA","B.Sc CS","B.A English","B.A Sociology","B.A Defence","B.Sc Visual com","B.Sc Data Analytics")
+        comNameCourse.place(x=80,y=120)
+
+        lbl3=Label(Optionsframe,text="Curriculum:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl3.place(x=10,y=140)
+
+        ameCourse=ttk.Combobox(Optionsframe,textvariable=self.cirofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=25)
+        ameCourse["values"]=("Ist Years","IInd Years","IIIrd Years")
+        ameCourse.place(x=80,y=140)
+
+        lbl4=Label(Optionsframe,text="Semester:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl4.place(x=10,y=160)
+
+        semCourse=ttk.Combobox(Optionsframe,textvariable=self.semofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=25)
+        semCourse["values"]=("Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6")
+        semCourse.place(x=80,y=160)
+
+        lbl5=Label(Optionsframe,text="Name:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl5.place(x=320,y=100)
+
+        txt5=Entry(Optionsframe,font=("times new roman",12,"bold"),textvariable=self.nameofcourse,width=25)
+        txt5.place(x=400,y=100)
+
+
+        lbl6=Label(Optionsframe,text="Code:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl6.place(x=320,y=120)
+
+        txt6=Entry(Optionsframe,font=("times new roman",10,"bold"),textvariable=self.codeofcourse,width=25)
+        txt6.place(x=400,y=120)
+
+        lbl8=Label(Optionsframe,text="Type:",font=("times new roman",10,"bold"),padx=2,pady=6)
+        lbl8.place(x=320,y=140)
+
+        puCourse=ttk.Combobox(Optionsframe,textvariable=self.typeofcourse,state="readonly",font=("times new roman",10,"bold"),
+                                                                                width=25)
+        puCourse["values"]=("UG","PG")
+        puCourse.place(x=400,y=140)
+
+
+
+
+
+        #===================================================functions=============================================================    
+
+    def userdetails(self,event=""):
+                import mysql.connector
+                con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+                mc=con.cursor()
+                password=self.ttpass.get()
+                query="select * from logindetails where password=%s"
+                val=(password,)
+                mc.execute(query,val)
+                rows=mc.fetchone()
+                self.username.set(rows[0])
+                self.wing.set(rows[1])
+                self.designation.set(rows[2])
+                self.yearofjoining.set(rows[3])
+                self.phonenumber.set(rows[5])
+                self.emailid.set(rows[6])
+                con.commit()
+
+    def userupdate(self):
+        import random
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        us=self.username.get()
+        wg=self.wing.get()
+        ds=self.designation.get()
+        yj=self.yearofjoining.get()
+        ps=self.password.get()
+        pn=self.phonenumber.get()
+        ei=self.emailid.get()
+        var1=(ps,)
+        query="delete from logindetails where password=%s"
+        #value=(var1,)
+        mc.execute(query,var1)
+        query="insert into logindetails(username, wingname, designation, yearofjoining, password, phonenumber, email) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+        val=(us,wg,ds,yj,ps,pn,ei,)
+        mc.execute(query,val)
+        con.commit()
+        print(mc.rowcount,"user record updated")  
+        messagebox.showinfo("UPDATES","The user record has been updated successfully")
+
+    def passwordchange(self):
+        open_main=messagebox.askyesno("Yes/NO","Want to change your password?")
+        if open_main>0:
+                self.new_window=Toplevel(self.root)
+                self.app=passwordchange(self.new_window)
+        else:
+            if not open_main:
+                    return
+
+
+
+    def addition(self):
+        open_main=messagebox.askyesno("Yes/NO","Application access restricted only to admin")
+        if open_main>0:
+                self.new_window=Toplevel(self.root)
+                self.app=add_in_window(self.new_window)
+        else:
+            if not open_main:
+                    return
+
+    def IExit(self):
+        IExit=messagebox.askyesno("Syllabus Management System","Do you want to log out?")
+        if IExit>0:
+            root.destroy()
+            return
+
+    def deletedata(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        #x=self.codeofcourse.get()
+        var1=(self.nameofcourse.get(),self.wingofcourse.get(),)
+        query="delete from syldetails where name=%s and wing=%s"
+        #value=(var1,)
+        mc.execute(query,var1)
+        #sql="DELETE from syllabus where sub_code='2018'"
+        #mc.execute(sql)
+        con.commit()
+        print(mc.rowcount,"record deleted")  
+        messagebox.showinfo("DELETED","The record has been deleted successfully")
+        self.fetch_data()
+
+    def update(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        #x=self.codeofcourse.get()
+        var1=(self.nameofcourse.get(),self.wingofcourse.get(),)
+        query="delete from syldetails where name=%s and wing=%s"
+        #value=(var1,)
+        mc.execute(query,var1)
+        #sql="DELETE from syllabus where sub_code='2018'"
+        #mc.execute(sql)
+        print(mc.rowcount,"record deleted")  
+        var1=self.yearofcourse.get()
+        var2=self.wingofcourse.get()
+        var3=self.cirofcourse.get()
+        var4=self.typeofcourse.get()
+        var5=self.semofcourse.get()
+        var6=self.nameofcourse.get()
+        var7=self.codeofcourse.get()
+        query="insert into syldetails(year, wing, curriculum, type, semester, name, code) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+        values=(var1,var2,var3,var4,var5,var6,var7,)  
+        mc.execute(query,values)                                                                     
+        print(mc.rowcount,"record inserted")
+        con.commit()
+        messagebox.showinfo("SUCCESS!","The record has been Updated")
+        self.fetch_data()
+
+
+
+    def search(self):
+        open_main=messagebox.askyesno("Yes/NO","Application access restricted only to admin")
+        if open_main>0:
+                self.new_window=Toplevel(self.root)
+                self.app=search_in_window(self.new_window)
+        else:
+            if not open_main:
+                    return
+
+    def fetch_data(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        mc.execute("select * from syldetails")
+        rows=mc.fetchall()
+        if len(rows)!=0:
+            self.data_table.delete(*self.data_table.get_children())
+            for i in rows:
+                self.data_table.insert("",END,values=i)
+            con.commit()
+        print("done")
+        mc.close()
+
+    def get_cursor(self,event=""):
+        cur=self.data_table.focus()
+        content=self.data_table.item(cur)
+        rows=content["values"]
+        print(rows)
+        self.yearofcourse.set(rows[0])
+        self.wingofcourse.set(rows[1])
+        self.cirofcourse.set(rows[2])
+        self.typeofcourse.set(rows[3])
+        self.semofcourse.set(rows[4])
+        self.nameofcourse.set(rows[5])
+        self.codeofcourse.set(rows[6])
+
+class passwordchange:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("CHANGE PASSWORD")
+        self.root.geometry("646x300+0+0")
+        self.password=StringVar()
+        self.repassword=StringVar()
+        self.repassword1=StringVar()
+
+        framex=Frame(self.root,background="grey",relief=RIDGE)
+        framex.place(x=130,y=30,width=350,height=240)
+        lbl=Label(framex,text="CHANGE PASSWORD",font=("Cambria",12,"bold"),fg="black",bg="grey")
+        lbl.grid(row=0,column=0)
+
+        username=Label(framex,text="EXISTING PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        username.grid(row=2,column=0)
+
+        self.password=ttk.Entry(framex,font=("times new roman",12,"bold"))
+        self.password.grid(row=2,column=1)
+
+        password=Label(framex,text="NEW PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        password.grid(row=4,column=0)
+
+        self.repassword=ttk.Entry(framex,textvariable=self.repassword,font=("times new roman",12,"bold"),foreground="black",background="grey")
+        self.repassword.grid(row=4,column=1)
+
+        repassword=Label(framex,text="NEW PASSWORD:",font=("times new roman",12,"bold"),fg="black",bg="grey")
+        repassword.grid(row=6,column=0)
+
+        self.repassword1=ttk.Entry(framex,textvariable=self.repassword1,font=("times new roman",12,"bold"),foreground="black",background="grey")
+        self.repassword1.grid(row=6,column=1)
+
+        loginbtn=Button(framex,text="CHANGE PASSWORD",command=self.change,font=("times new roman",12,"bold"),bd=3,relief=RIDGE,fg="white",bg="red",activeforeground="white",activebackground="red")
+        loginbtn.grid(row=9,column=0)
+
+    def change(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="logindetails")
+        mc=con.cursor()
+        query="select * from logindetails where password=%s"
+        val=(self.password.get(),)
+        mc.execute(query,val)
+        rows=mc.fetchall()
+        if rows==None:
+                messagebox.showinfo("NON-EXISTING DATA","The login does not exists")
+                print("Result exists")
+                
+        else:
+                con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+                mc=con.cursor()
+                query="select * from logindetails where password=%s"
+                val=(self.password.get(),)
+                mc.execute(query,val)
+                rows=mc.fetchone()
+                print(rows)
+                t1=tuple()
+                n=len(t1)
+                var4=self.repassword.get()
+                i=0
+                for data in rows:
+                    if i!=4:
+                        t1+(data,)
+                    else:
+                        t1+(data,)
+
+                query="delete from logindetails where password=%s"
+                val=(self.password.get(),)
+                mc.execute(query,val)
+                print(t1)
+                query="insert into logindetails(username, wingname, designation, yearofjoining, password, phonenumber, email) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+                val=(t1[0],t1[1],t1[2],t1[3],t1[4],t1[5],t1[6],)
+                mc.execute(query,val)
+                print(mc.rowcount,"record inserted")
+                con.commit()
+                messagebox.showinfo("SUCCESS!","The password has been updated")
+
+
+
+
+class add_in_window:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("ADD IN")
+        self.root.geometry("775x400+0+0")
+
+        self.yearofcourse=IntVar()
+        self.wingofcourse=StringVar()
+        self.cirofcourse=StringVar()
+        self.typeofcourse=StringVar()
+        self.semofcourse=StringVar()
+        self.nameofcourse=StringVar()
+        self.codeofcourse=StringVar()
+
+
+        Dataframe=Frame(self.root,bd=20,relief=RIDGE)
+        Dataframe.place(x=0,y=0,width=775,height=400)
+
+        lblt=Label(Dataframe,text="GIVE IN THE DATA TO ADD NEW COURSE :",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lblt.grid(row=0,column=0)
+
+        lbl1=Label(Dataframe,text="Year of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl1.grid(row=2,column=0)
+
+        txt1=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.yearofcourse,width=33)
+        txt1.grid(row=2,column=1)
+
+        lbl2=Label(Dataframe,text="Programme/wing of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl2.grid(row=3,column=0)
+
+        comNameCourse=ttk.Combobox(Dataframe,textvariable=self.wingofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=32)
+        comNameCourse["values"]=("B.Sc IT","B.Com ISM","B.Com CS","B.Com PA","B.Com General","B.Com Honours","B.com Marketing management","BCA","BBA","B.Sc CS","B.A English","B.A Sociology","B.A Defence","B.Sc Visual com","B.Sc Data Analytics")
+        comNameCourse.grid(row=3,column=1)
+
+        lbl3=Label(Dataframe,text="Curriculum for:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl3.grid(row=4,column=0)
+
+        ameCourse=ttk.Combobox(Dataframe,textvariable=self.cirofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=32)
+        ameCourse["values"]=("Ist Years","IInd Years","IIIrd Years")
+        ameCourse.grid(row=4,column=1)
+
+        lbl4=Label(Dataframe,text="Semester of the course",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl4.grid(row=5,column=0)
+
+        semCourse=ttk.Combobox(Dataframe,textvariable=self.semofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=32)
+        semCourse["values"]=("Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6")
+        semCourse.grid(row=5,column=1)
+
+        lbl5=Label(Dataframe,text="Name of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl5.grid(row=6,column=0)
+
+        txt5=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.nameofcourse,width=33)
+        txt5.grid(row=6,column=1)
+
+
+        lbl6=Label(Dataframe,text="Code of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl6.grid(row=7,column=0)
+
+        txt6=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.codeofcourse,width=33)
+        txt6.grid(row=7,column=1)
+
+        lbl8=Label(Dataframe,text="Type Of Wing:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl8.grid(row=8,column=0)
+
+        puCourse=ttk.Combobox(Dataframe,textvariable=self.typeofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=32)
+        puCourse["values"]=("UG","PG")
+        puCourse.grid(row=8,column=1)
+
+        self.btnsub=Button(Dataframe,command=self.add,text="SUBMIT",bg="grey",fg="white",font=("arial",12,"bold"),width=31,height=1,padx=2,pady=6)
+        self.btnsub.grid(row=9,column=1)
+
+    def fetch_data(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        mc.execute("select * from syldetails")
+        rows=mc.fetchall()
+        if len(rows)!=0:
+            self.data_table.delete(*self.data_table.get_children())
+            for i in rows:
+                self.data_table.insert("",END,values=i)
+            con.commit()
+        print("done")
+        mc.close()    
+
+
+    def add(self):
+        if self.nameofcourse.get()==""or self.codeofcourse.get()=="":
+            messagebox.showerror("ERROR!","All fields are mandatory")
+        else:
+            import mysql.connector
+            con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+            mc=con.cursor()
+            var1=self.yearofcourse.get()
+            var2=self.wingofcourse.get()
+            var3=self.cirofcourse.get()
+            var4=self.typeofcourse.get()
+            var5=self.semofcourse.get()
+            var6=self.nameofcourse.get()
+            var7=self.codeofcourse.get()
+            query="insert into syldetails(year, wing, curriculum, type, semester, name, code) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+            values=(var1,var2,var3,var4,var5,var6,var7,)  
+            mc.execute(query,values)                                                                     
+            print(mc.rowcount,"record inserted")
+            con.commit()
+            messagebox.showinfo("SUCCESS!","The record has been added")
+            self.fetch_data()
+            #con.close()                    
+            messagebox.showinfo("SUCCESS!","The record has been added")
+
+    
+
+class search_in_window:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("ADD IN")
+        self.root.geometry("775x400+0+0")
+
+        self.yearofcourse=IntVar()
+        self.wingofcourse=StringVar()
+        self.cirofcourse=StringVar()
+        self.typeofcourse=StringVar()
+        self.semofcourse=StringVar()
+        self.nameofcourse=StringVar()
+        self.codeofcourse=StringVar()
+
+
+        Dataframe=Frame(self.root,bd=20,relief=RIDGE)
+        Dataframe.place(x=0,y=0,width=775,height=400)
+
+
+        lbl1=Label(Dataframe,text="Enter the details to search",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl1.grid(row=1,column=0)
+
+        lbl5=Label(Dataframe,font=("times new roman",12,"bold"),text="Name of the course:",padx=2,pady=6)
+        lbl5.grid(row=3,column=0)
+        txt5=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.nameofcourse,width=33)
+        txt5.grid(row=3,column=1)
+
+        lbl3=Label(Dataframe,text="Wing of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lbl3.grid(row=4,column=0)
+
+        val=self.val()
+        if val==0:
+            comNameCourse=ttk.Combobox(Dataframe,textvariable=self.wingofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=32)
+            comNameCourse["values"]=("B.Sc IT","B.Com ISM","B.Com CS","B.Com PA","B.Com General","B.Com Honours","B.com Marketing management","BCA","BBA","B.Sc CS","B.A English","B.A Sociology","B.A Defence","B.Sc Visual com","B.Sc Data Analytics")
+            comNameCourse.grid(row=4,column=1)
+        else:
+            comNameCourse=ttk.Combobox(Dataframe,textvariable=self.wingofcourse,state="readonly",font=("times new roman",12,"bold"),
+                                                                                width=32)
+            comNameCourse["values"]=val
+            comNameCourse.grid(row=4,column=1)
+
+        self.btnsub=Button(Dataframe,command=self.searchdata,text="SEARCH",bg="grey",fg="white",font=("arial",12,"bold"),width=20,height=1,padx=2,pady=6)
+        self.btnsub.grid(row=5,column=2)
+
+        self.btnsub1=Button(Dataframe,command=self.adddata,text="ADD",bg="grey",fg="white",font=("arial",12,"bold"),width=20,height=1,padx=2,pady=6)
+        self.btnsub1.grid(row=11,column=2)
+
+        lal5=Label(Dataframe,text="DETAILS OF THE COURSE:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lal5.grid(row=6,column=0)
+
+        lal=Label(Dataframe,text="Year of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lal.grid(row=7,column=0)
+        txtl=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.yearofcourse,width=33)
+        txtl.grid(row=7,column=1)
+
+        lal1=Label(Dataframe,text="Curriculum:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lal1.grid(row=8,column=0)
+        txtl1=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.cirofcourse,width=33)
+        txtl1.grid(row=8,column=1)
+
+        lal2=Label(Dataframe,text="Type of degree:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lal2.grid(row=9,column=0)
+        txtl2=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.typeofcourse,width=33)
+        txtl2.grid(row=9,column=1)
+
+        lal3=Label(Dataframe,text="Semester:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lal3.grid(row=10,column=0)
+        txtl3=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.semofcourse,width=33)
+        txtl3.grid(row=10,column=1)
+
+        lal4=Label(Dataframe,text="code of the course:",font=("times new roman",12,"bold"),padx=2,pady=6)
+        lal4.grid(row=11,column=0)
+        txtl4=Entry(Dataframe,font=("times new roman",12,"bold"),textvariable=self.codeofcourse,width=33)
+        txtl4.grid(row=11,column=1)
+
+    def fetch_data(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        mc.execute("select * from syldetails")
+        rows=mc.fetchall()
+        if len(rows)!=0:
+            self.data_table.delete(*self.data_table.get_children())
+            for i in rows:
+                self.data_table.insert("",END,values=i)
+            con.commit()
+        print("done")
+        mc.close()
+
+    def val(self):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        name=self.nameofcourse.get()
+        query="select * from syldetails where name=%s"
+        val=(name,)
+        mc.execute(query,val)
+        rows=mc.fetchone()
+        if rows==None:
+                return 0
+        else:
+                con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+                mc=con.cursor()
+                name=self.nameofcourse.get()
+                query="select wing from syldetails where name=%s"
+                val=(name,)
+                mc.execute(query,val)
+                rows=mc.fetchall
+                return rows
+                con.commit()
+
+    
+    def searchdata(self,event=""):
+        import mysql.connector
+        con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+        mc=con.cursor()
+        name=self.nameofcourse.get()
+        wng=self.wingofcourse.get()
+        query="select * from syldetails where name=%s and wing=%s"
+        val=(name,wng,)
+        mc.execute(query,val)
+        rows=mc.fetchone()
+        if rows==None:
+                messagebox.showinfo("NON-EXISTING DATA","The course does not exists")
+                open_main=messagebox.askyesno("Yes/NO","Do You want to add a new course to this wing?")
+                if open_main>0:
+                    messagebox.showinfo("ENTER DETAILS","Enter the course details below")
+                    
+                else:
+                    if not open_main:
+                        return
+                
+        else:
+                con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+                mc=con.cursor()
+                name=self.nameofcourse.get()
+                wng=self.wingofcourse.get()
+                query="select * from syldetails where name=%s and wing=%s"
+                val=(name,wng,)
+                mc.execute(query,val)
+                rows=mc.fetchone()
+                self.yearofcourse.set(rows[0])
+                self.cirofcourse.set(rows[2])
+                self.typeofcourse.set(rows[3])
+                self.semofcourse.set(rows[4])
+                self.codeofcourse.set(rows[6])
+                con.commit()
+                   
+        con.commit()
+        mc.close()
+
+    def adddata(self):
+        if self.nameofcourse.get()==""or self.codeofcourse.get()=="":
+            messagebox.showerror("ERROR!","All fields are mandatory")
+        else:
+            import mysql.connector
+            con=mysql.connector.connect(host="localhost",username="root",password="omsairam!",database="coursedetails")
+            mc=con.cursor()
+            var1=self.yearofcourse.get()
+            var2=self.wingofcourse.get()
+            var3=self.cirofcourse.get()
+            var4=self.typeofcourse.get()
+            var5=self.semofcourse.get()
+            var6=self.nameofcourse.get()
+            var7=self.codeofcourse.get()
+            query="insert into syldetails(year, wing, curriculum, type, semester, name, code) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+            values=(var1,var2,var3,var4,var5,var6,var7,)  
+            mc.execute(query,values)                                                                     
+            print(mc.rowcount,"record inserted")
+            con.commit()
+            messagebox.showinfo("SUCCESS!","The record has been added")
+            self.fetch_data()
+            #con.close()                    
+            messagebox.showinfo("SUCCESS!","The record has been added")
+
+
+    
+
+    '''def get_cursor(self,event=""):
+        cur=self.data_table.focus()
+        content=self.data_table.item(cur)
+        row=content["values"]
+        self.yearofcourse.set(row[0])
+        self.wingofcourse.set(row[1])
+        self.cirofcourse.set(row[2])
+        self.typeofcourse.set(row[3])
+        self.semofcourse.set(row[4])
+        self.nameofcourse.set(row[5])
+        self.codeofcourse.set(row[6])
+    '''
+
+
+
+if __name__=="__main__":
+    main()
